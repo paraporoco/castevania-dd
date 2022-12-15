@@ -1,0 +1,58 @@
+Parameters:
+  Tag:
+    Type: String
+    Default: latest
+
+  DesiredCount:
+    Type: Number
+    Default: 0
+
+  TargetGroup:
+    Type: String
+
+  Cluster:
+    Type: String
+
+  Repository:
+    Type: String
+
+  ECSServiceRole:
+    Type: String
+
+Resources:
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref Cluster
+      Role: !Ref ECSServiceRole
+      DesiredCount: !Ref DesiredCount
+      TaskDefinition: !Ref TaskDefinition
+      LoadBalancers:
+        - ContainerName: DuckHunt
+          ContainerPort: 8088
+          TargetGroupArn: !Ref TargetGroup
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-DuckHunt
+      ContainerDefinitions:
+        - Name: DuckHunt
+          Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}:${Tag}
+          Essential: true
+          Memory: 128
+          MountPoints:
+            - SourceVolume: my-vol
+              ContainerPath: /var/www/my-vol
+          PortMappings:
+            - ContainerPort: 8088
+          Environment:
+            - Name: Tag
+              Value: !Ref Tag
+            - Name: fortytwo
+              Value: TWsrK0V1VzJ6Z2VGaTVFQXl5UUdhVlVrN2x0cDZnQzE2TDNRa2Y0K3NJMkJGRDdTMWtXWGV4R3FkSmdwZ0pwNlNRTHpHM1oybnRBeXh5ZUpscmx4b3dvRldRbWRpUmtuUVZETDhqUEhvQnorT3dTR0FNZHpxbHdNcC9mbkxDM0RFYVVVZkdxVDVMclBkbnNTYmxDVDFkQm1CNFNLbXRRdERGNmJVY0NhblRGWVI2T1hpQ3NmV1dkQ1lFMGVnVE1OallibUFDVEZGWEZ4Y3BISDNXTkJORmR3TmZ2bVo4OE1DV3ZvS3NQS2c3YnlWTWhtVVdnMnpDT0hrL2ltWjBmVGw3WHR2Q3ZiSVNqZ2piYkRFRWd3eVZtaDA0ZG5RcWw3UU5IM0NENWIvejdNSEVlNlY0NDJsdWg4N3QrU290SmVBOFF0Rks2MmtWY0pJa3dqNUJBcEZKSWxLNHkybkxVOUp0aWhrS0RXYTM4QVJ5NHlUdjRpSjRoZGxObkJjSkFIcFpqV25yTHVlODU1Q0owTDh1MldzTFA1M21qMitzenFYM21WNGhWSkxmQ2ExZ3J2aGc4TDNTUEhJblhJRjJLNHYwYlZQeW1VWG5TWTdKRHg5NHNhejk2aEtFUi9yUVhjcVNmZjNKZjJvZmdGajlaR25HbUxyc0RMRmt2SncvdWx5SUgwYXVyY1ByV2FDb1lyNU9mY0JFSVk4SHlsT29tWmxKSFJid0lsWHRrOEwrSUNIMGw4c2xGQ3BWWkEzTCt5a0g0SG5lOXZqUE5ZaTcyS1ZuMzB4L1dvTjRKTUdBdWtGYU51NzA2ZFhDZTZpWGFxS1FNRWJrQUQvQ01rVlQxNC9hVC9GZlRuVWlvbnd5MmszRHFmYVVmdjU1czRLaGp3Q1J3RjI2TjM4NGlaZ0RwQzhGeTY5cDJtd21aTFpRSW40ZnBtRzRmNHRCanBWUHl2QWJjN3ZqZVNvNU5WREY1am9jT1JxNUx0N0pXamp3Tkl6ZXpGQXpvS01TTkQ3UjJoSGJPY0Nld0xkUk1sUndhUWhqeExTUVBweUg0V29jcWhEQWphYmdobGVMR3NrdkJnUHBnTFA2eGh6WWFmVjZKVGs5Tm5ycms5bU1HOHNvbk5lSVIrU3dOMHZVNElZY1BvU3ZLWk1mSlFydzlqNm51U2JWc2pCa0gwTDFrdnhSUFBaWHhLano5ajEveEw2TjdFeUNYbHhMVHhlRlZ1QjFaR0NuN2dZN3hhMjVzK2g3ZXVDZWxBOHp1WUhKeitEb3Qwd2RRbWl3NEpJY1ROenhCdEhyV2JXTThuam1JYTE3d3l5T2d2allqRklNYUM5RDlYM3FiclduWjBXeWF2QjVkK0txMUFpV0VVT0RBTnJLWmc5VENFOEgvRi9wM0J2ZnRQWUYrZS9FbHZMUHhQU3NVUmZJOFlkcWdSVThCNEpXa0N2S2ZpWjNzbjVlUmJCOTF1UFFmbmlxMVc2c2FFcW5LdXVndlR2UmxHcFpqNWRLN1U5d2UxWWRyRmRmMktqMTZScUg0NnIrUVBaTUdpdXZtNVQ1bVRsOEpEVDlYUGg1UzRmVis1YmJwQnlnWVFYeDVOU28xbXl1OVFWelNSOEMxSzdhL1RrRDBHbkl1WkhDWmN2WWx3TmhsSUNudWpLYU1HamszemozS2ZrK05Kc205UHdOME1XdlZPVnBGMW9tNGlYbEVOZWkxRHk3d0FEM0VkOFcvRVRndUdMRnVwYTFMSEFvUE1GdmxHUzdtS2V5aUl0ejNKTUh1eVZZVEo0RFpYS3dQZ2JnMnN6M2FqdncxN1VHSUxEVWw5Qmhvamxza3F0SGlqdTMraFQrblRqSW1yVVd2NmhlZyszNnBFNzVtYkJJYmNpYXhEWlpHODcvMkxBdEJBTXExNWtOZGJNVjBIUE1POHlRK0ZZK1ZCTTdFQkE1Q0ZoUjE1Ym9oQkRnPT0=
+            - Name: DEBUG
+              Value: express:router
+      Volumes:
+        - Name: my-vol
